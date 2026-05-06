@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>FAQ – Veelgestelde vragen | Jouw Taxi België | Fleetconnect</title>
+    <meta name="description" content="Veelgestelde vragen over taxivervoer, tarieven, annuleren, bagage, huisdieren en meer.">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* (stijl exact hetzelfde als eerder - kopieer uit uw bestaande T3faq.html) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0A0A0A; font-family: 'Cormorant Garamond', serif; font-weight: 400; color: #EDEDED; scroll-behavior: smooth; }
+        h1, h2, h3, .logo-fixed { font-family: 'Playfair Display', serif; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 2; }
+        .site-header { padding: 1.5rem 0; border-bottom: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 2rem; }
+        .header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .logo a { font-size: 1.8rem; font-weight: 800; color: #EDEDED; text-decoration: none; letter-spacing: 2px; }
+        .logo span { color: #D4AF37; }
+        .nav-links a { color: #EDEDED; text-decoration: none; margin-left: 1.8rem; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover { color: #D4AF37; }
+        .faq-card { background: rgba(18, 18, 18, 0.9); backdrop-filter: blur(16px); border-radius: 56px; border: 1px solid rgba(212, 175, 55, 0.4); padding: 2.5rem; margin: 2rem 0; }
+        h1 { font-size: 2.5rem; background: linear-gradient(135deg, #FFF 0%, #D4AF37 80%); background-clip: text; -webkit-background-clip: text; color: transparent; display: inline-block; border-bottom: 2px solid #D4AF37; padding-bottom: 0.5rem; margin-bottom: 2rem; }
+        .faq-item { background: #0A0A0A; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 32px; margin-bottom: 1rem; overflow: hidden; transition: all 0.2s; }
+        .faq-question { padding: 1.2rem 1.8rem; font-size: 1.3rem; font-weight: 600; color: #D4AF37; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Playfair Display', serif; }
+        .faq-question:hover { background: rgba(212, 175, 55, 0.1); }
+        .toggle-icon { font-size: 1.8rem; font-weight: 400; transition: transform 0.2s; }
+        .faq-answer { max-height: 0; padding: 0 1.8rem; background: #111; color: #DDD; font-size: 1.05rem; line-height: 1.5; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; }
+        .faq-answer.open { max-height: 400px; padding: 0 1.8rem 1.2rem 1.8rem; }
+        .faq-answer a { color: #D4AF37; text-decoration: none; }
+        .faq-answer a:hover { text-decoration: underline; }
+        .footer { background: #0A0A0A; border-top: 1px solid rgba(212, 175, 55, 0.2); padding: 2rem 0; margin-top: 3rem; }
+        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; align-items: center; }
+        .footer a { color: #D4AF37; text-decoration: none; margin: 0 0.3rem; }
+        .footer a:hover { text-decoration: underline; }
+        @media (max-width: 800px) { .container { padding: 0 1rem; } .faq-card { padding: 1.5rem; } h1 { font-size: 2rem; } .faq-question { font-size: 1.1rem; padding: 1rem 1.2rem; } .faq-answer.open { padding: 0 1.2rem 1rem 1.2rem; } .header-inner { flex-direction: column; text-align: center; } .nav-links a { margin: 0 0.8rem; } }
+    </style>
+</head>
+<body>
+
+<div class="site-header">
+    <div class="container header-inner">
+        <div class="logo">
+            <a href="T3.html">Fleet<span>Connect</span></a>
+        </div>
+        <div class="nav-links">
+            <a href="T3.html#hero">Home</a>
+            <a href="T3.html#booking">Boeken</a>
+            <a href="T3privacy.html">Privacy</a>
+            <a href="T3cookiebeleid.html">Cookiebeleid</a>
+            <a href="T3algeme-voorwaarden.html">Voorwaarden</a>
+            <a href="T3faq.html" style="color:#D4AF37;">FAQ</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="faq-card">
+        <h1>Veelgestelde vragen</h1>
+        <!-- Alle FAQ-items (hetzelfde als eerder, maar met links naar T3privacy.html etc.) -->
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">📞 Hoe boek ik een taxi bij jullie?<span class="toggle-icon">+</span></div><div class="faq-answer">U kunt een taxi boeken via ons online boekingsformulier, telefonisch via <a href="tel:+32465397740">0465 39 77 40</a> of per e-mail via <a href="mailto:info@fleetconnect.be">info@fleetconnect.be</a>.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">💰 Hoe worden de tarieven berekend?<span class="toggle-icon">+</span></div><div class="faq-answer">Wij hanteren vaste prijzen die vooraf worden getoond. Deze zijn conform de wettelijke maximumtarieven. Tarieven kunnen regionaal verschillen. Voor internationaal vervoer geldt een offerte op maat.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">🗓️ Kan ik een rit annuleren? Wat zijn de kosten?<span class="toggle-icon">+</span></div><div class="faq-answer">U kunt kosteloos annuleren tot 60 minuten vóór de afgesproken ophaaltijd. Binnen 60 minuten vóór de ophaaltijd is 50% van het ritbedrag verschuldigd. Binnen 15 minuten vóór de ophaaltijd of bij no-show is 100% van het ritbedrag verschuldigd.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">✈️ Wat als mijn vlucht vertraging heeft?<span class="toggle-icon">+</span></div><div class="faq-answer">Geef bij het boeken uw vluchtnummer door. Wij monitoren de actuele aankomsttijd. De eerste 60 minuten wachttijd zijn gratis. Daarna wordt een wachttarief van €15 per 30 minuten gerekend.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">🧳 Hoeveel bagage mag ik meenemen?<span class="toggle-icon">+</span></div><div class="faq-answer">In een standaard personenauto mag u maximaal 2 koffers en 1 handbagagestuk meenemen. Voor extra bagage kan een toeslag van €5 per extra koffer worden gerekend.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">👨‍👩‍👧‍👦 Zijn er kinderzitjes beschikbaar?<span class="toggle-icon">+</span></div><div class="faq-answer">Ja, op verzoek kunnen wij kinderzitjes voor alle leeftijden beschikbaar stellen. Dit dient minimaal 24 uur van tevoren te worden aangegeven, kosteloos.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">♿ Bieden jullie rolstoeltoegankelijke taxi's aan?<span class="toggle-icon">+</span></div><div class="faq-answer">Ja, wij beschikken over rolstoeltoegankelijke voertuigen. Geef dit bij het boeken aan, zodat wij het juiste voertuig kunnen inzetten. Er geldt geen extra toeslag.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">🐾 Mag ik mijn huisdier meenemen?<span class="toggle-icon">+</span></div><div class="faq-answer">Kleine huisdieren in een reismand zijn toegestaan. Grotere honden alleen tegen een toeslag van €5 (voor reiniging). Geleidehonden mogen altijd kosteloos mee.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">🛡️ Hoe worden mijn persoonsgegevens beschermd?<span class="toggle-icon">+</span></div><div class="faq-answer">Wij verwerken persoonsgegevens in overeenstemming met de AVG en de Belgische Privacywet. U heeft recht op inzage, correctie en verwijdering. Lees meer in onze <a href="T3privacy.html">privacyverklaring</a>.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">📝 Hoe dien ik een klacht in?<span class="toggle-icon">+</span></div><div class="faq-answer">Klachten kunt u indienen via <a href="mailto:klachten@fleetconnect.be">klachten@fleetconnect.be</a>. Wij nemen uw klacht binnen 14 werkdagen in behandeling.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">🌍 Bieden jullie ook internationaal vervoer aan?<span class="toggle-icon">+</span></div><div class="faq-answer">Ja, wij verzorgen professioneel taxivervoer naar alle buurlanden en verder. Neem contact met ons op voor een offerte op maat.</div></div>
+        <div class="faq-item"><div class="faq-question" onclick="toggleAnswer(this)">📋 Welke vergunningen hebben jullie chauffeurs?<span class="toggle-icon">+</span></div><div class="faq-answer">Al onze chauffeurs beschikken over de verplichte Universele Chauffeurslicentie (sinds 2025) en de bestuurderspas.</div></div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container footer-content">
+        <div>© 2025 Fleetconnect – <span style="color:#D4AF37;">Black & Gold Collection</span></div>
+        <div>
+            <a href="T3.html#booking">Boeken</a> |
+            <a href="T3privacy.html">Privacy</a> |
+            <a href="T3cookiebeleid.html">Cookiebeleid</a> |
+            <a href="T3algeme-voorwaarden.html">Voorwaarden</a> |
+            <a href="T3faq.html">FAQ</a> |
+            <a href="T3.html">← Terug naar hoofdpagina</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleAnswer(element) {
+        const answer = element.nextElementSibling;
+        const icon = element.querySelector('.toggle-icon');
+        answer.classList.toggle('open');
+        icon.textContent = answer.classList.contains('open') ? '−' : '+';
+    }
+</script>
+</body>
+</html>

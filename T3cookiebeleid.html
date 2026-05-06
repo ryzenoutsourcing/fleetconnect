@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Cookiebeleid – Jouw Taxi België | Fleetconnect</title>
+    <meta name="description" content="Cookiebeleid van Jouw Taxi België – informatie over cookies en uw keuzes.">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* (stijl exact hetzelfde als eerder - beknopt weergegeven) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0A0A0A; font-family: 'Cormorant Garamond', serif; font-weight: 400; color: #EDEDED; scroll-behavior: smooth; }
+        h1, h2, h3, .logo-fixed { font-family: 'Playfair Display', serif; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 2; }
+        .site-header { padding: 1.5rem 0; border-bottom: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 2rem; }
+        .header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .logo a { font-size: 1.8rem; font-weight: 800; color: #EDEDED; text-decoration: none; letter-spacing: 2px; }
+        .logo span { color: #D4AF37; }
+        .nav-links a { color: #EDEDED; text-decoration: none; margin-left: 1.8rem; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover { color: #D4AF37; }
+        .cookie-card { background: rgba(18, 18, 18, 0.9); backdrop-filter: blur(16px); border-radius: 56px; border: 1px solid rgba(212, 175, 55, 0.4); padding: 2.5rem; margin: 2rem 0; }
+        h1 { font-size: 2.5rem; background: linear-gradient(135deg, #FFF 0%, #D4AF37 80%); background-clip: text; -webkit-background-clip: text; color: transparent; display: inline-block; border-bottom: 2px solid #D4AF37; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+        .last-updated { color: #D4AF37; font-style: italic; margin-bottom: 1.5rem; font-size: 0.95rem; }
+        h2 { font-size: 1.8rem; color: #D4AF37; margin: 1.8rem 0 1rem 0; font-weight: 600; }
+        p, li { color: #DDD; line-height: 1.6; margin-bottom: 0.75rem; }
+        ul, ol { margin-left: 1.8rem; margin-bottom: 1.2rem; }
+        a { color: #D4AF37; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .cookie-table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: #0A0A0A; border-radius: 24px; overflow: hidden; }
+        .cookie-table th, .cookie-table td { border: 1px solid rgba(212, 175, 55, 0.3); padding: 12px 16px; text-align: left; vertical-align: top; }
+        .cookie-table th { background: #1a1a1a; color: #D4AF37; font-weight: 700; }
+        .cookie-table td { color: #CCC; }
+        .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; background: #111; border-top: 2px solid #D4AF37; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; z-index: 10000; font-family: 'Cormorant Garamond', serif; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
+        .cookie-banner button { background: #D4AF37; border: none; padding: 8px 20px; border-radius: 40px; font-weight: bold; cursor: pointer; color: #0A0A0A; margin: 0 5px; transition: all 0.2s; }
+        .cookie-banner button:hover { background: #c5a028; transform: scale(1.02); }
+        .cookie-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); display: flex; justify-content: center; align-items: center; z-index: 10001; }
+        .cookie-modal { background: #1a1a1a; border: 1px solid #D4AF37; border-radius: 48px; padding: 2rem; max-width: 500px; width: 90%; text-align: center; }
+        .cookie-modal h3 { color: #D4AF37; margin-bottom: 1rem; }
+        .cookie-modal label { display: block; margin: 0.8rem 0; font-size: 1.1rem; cursor: pointer; }
+        .cookie-modal input { margin-right: 10px; transform: scale(1.2); }
+        .cookie-modal button { background: #D4AF37; border: none; padding: 10px 24px; border-radius: 40px; font-weight: bold; cursor: pointer; margin-top: 1rem; }
+        .footer { background: #0A0A0A; border-top: 1px solid rgba(212, 175, 55, 0.2); padding: 2rem 0; margin-top: 3rem; }
+        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; align-items: center; }
+        .footer a { color: #D4AF37; text-decoration: none; margin: 0 0.3rem; }
+        .footer a:hover { text-decoration: underline; }
+        @media (max-width: 800px) { .container { padding: 0 1rem; } .cookie-card { padding: 1.5rem; } h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } .header-inner { flex-direction: column; text-align: center; } .nav-links a { margin: 0 0.8rem; } .cookie-banner { flex-direction: column; text-align: center; } .cookie-table th, .cookie-table td { padding: 8px; font-size: 0.9rem; } }
+    </style>
+</head>
+<body>
+
+<div class="site-header">
+    <div class="container header-inner">
+        <div class="logo">
+            <a href="T3.html">Fleet<span>Connect</span></a>
+        </div>
+        <div class="nav-links">
+            <a href="T3.html#hero">Home</a>
+            <a href="T3.html#booking">Boeken</a>
+            <a href="T3privacy.html">Privacy</a>
+            <a href="T3cookiebeleid.html" style="color:#D4AF37;">Cookiebeleid</a>
+            <a href="T3algeme-voorwaarden.html">Voorwaarden</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="cookie-card">
+        <h1>Cookiebeleid</h1>
+        <div class="last-updated">Laatst bijgewerkt: 1 mei 2026</div>
+        <h2>1. Wat zijn cookies?</h2>
+        <p>Cookies zijn kleine tekstbestandjes die worden opgeslagen op uw computer of mobiele apparaat wanneer u onze website bezoekt. Via de cookiebanner krijgen bezoekers de mogelijkheid om aan te geven of ze hun toestemming geven voor het gebruik van specifieke cookies. De Belgische Gegevensbeschermingsautoriteit (GBA) heeft hier strikte regels voor.</p>
+        <h2>2. Welke cookies gebruiken wij?</h2>
+        <table class="cookie-table"><thead><tr><th>Soort cookie</th><th>Doel</th><th>Toestemming nodig?</th></tr></thead><tbody>
+        <tr><td><strong>Strikt noodzakelijke cookies</strong></td><td>Essentieel voor de werking van de website (bijv. onthouden van cookievoorkeuren, taalkeuze).</td><td>Nee</td></tr>
+        <tr><td><strong>Analytische cookies</strong></td><td>Verzamelen anonieme statistieken over websitegebruik (bijv. Google Analytics met geanonimiseerd IP).</td><td>Ja – expliciete toestemming via cookiebanner</td></tr>
+        <tr><td><strong>Marketingcookies</strong></td><td>Worden gebruikt om advertenties relevanter te maken.</td><td>Ja – expliciete toestemming via cookiebanner</td></tr>
+        </tbody></table>
+        <h2>3. Cookiebanner en toestemming</h2>
+        <p>Op grond van de Belgische privacywetgeving zijn wij verplicht om:</p>
+        <ul><li>U vooraf te informeren over het gebruik van cookies;</li><li>Uw <strong>expliciete toestemming</strong> te vragen voor het plaatsen van niet-noodzakelijke cookies;</li><li>U in staat te stellen uw toestemming op elk moment in te trekken.</li></ul>
+        <h2>4. Uw cookievoorkeuren beheren</h2>
+        <p>U kunt op elk moment uw cookievoorkeuren wijzigen of uw toestemming intrekken via de knop 'Cookie-instellingen' hieronder.</p>
+        <div style="text-align: center; margin: 2rem 0;"><button id="openCookieSettingsBtn" class="btn" style="background:#D4AF37; color:#0A0A0A; padding: 10px 30px; border-radius: 40px; font-weight: bold; border: none; cursor: pointer;">🍪 Cookie-instellingen aanpassen</button></div>
+        <h2>5. Vragen?</h2>
+        <p>Als u vragen heeft over ons cookiebeleid, kunt u contact met ons opnemen via <a href="mailto:info@fleetconnect.be">info@fleetconnect.be</a>.</p>
+        <hr><p style="font-size:0.9rem; text-align:center;">© 2025 Fleetconnect – Black & Gold Collection | Jouw vertrouwde partner in luxe vervoer</p>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container footer-content">
+        <div>© 2025 Fleetconnect – <span style="color:#D4AF37;">Black & Gold Collection</span></div>
+        <div>
+            <a href="T3.html#booking">Boeken</a> |
+            <a href="T3privacy.html">Privacy</a> |
+            <a href="T3cookiebeleid.html">Cookiebeleid</a> |
+            <a href="T3algeme-voorwaarden.html">Voorwaarden</a> |
+            <a href="T3.html">← Terug naar hoofdpagina</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function getCookiePreferences() { const prefs = localStorage.getItem('cookiePreferences'); return prefs ? JSON.parse(prefs) : null; }
+    function setCookiePreferences(preferences) { localStorage.setItem('cookiePreferences', JSON.stringify(preferences)); console.log('Cookie voorkeuren opgeslagen:', preferences); }
+    function showCookieBanner() {
+        if (document.querySelector('.cookie-banner')) return;
+        const banner = document.createElement('div');
+        banner.className = 'cookie-banner';
+        banner.innerHTML = `<p>🍪 Wij gebruiken cookies om onze website te laten functioneren en te verbeteren. Functionele cookies worden altijd geplaatst. Voor analytische en marketingcookies vragen wij uw toestemming. <a href="T3cookiebeleid.html" style="color:#D4AF37;">Lees meer</a>.</p><div><button class="btn-accept-all">Alles accepteren</button><button class="btn-reject">Alleen noodzakelijk</button><button class="btn-customize">Instellingen aanpassen</button></div>`;
+        document.body.appendChild(banner);
+        banner.querySelector('.btn-accept-all').addEventListener('click', () => { setCookiePreferences({ analytical: true, marketing: true }); banner.remove(); });
+        banner.querySelector('.btn-reject').addEventListener('click', () => { setCookiePreferences({ analytical: false, marketing: false }); banner.remove(); });
+        banner.querySelector('.btn-customize').addEventListener('click', () => { showCookieModal(banner); });
+    }
+    function showCookieModal(banner = null) {
+        const prefs = getCookiePreferences() || { analytical: true, marketing: false };
+        const modalHtml = `<div class="cookie-modal"><h3>Cookievoorkeuren</h3><label><input type="checkbox" id="allow-analytical" ${prefs.analytical ? 'checked' : ''}> Analytische cookies (anoniem)</label><label><input type="checkbox" id="allow-marketing" ${prefs.marketing ? 'checked' : ''}> Marketingcookies</label><br><br><button id="save-preferences">Opslaan</button><button id="close-modal" style="background:#555; margin-left:10px;">Sluiten</button></div>`;
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'cookie-modal-overlay';
+        modalOverlay.innerHTML = modalHtml;
+        document.body.appendChild(modalOverlay);
+        const saveBtn = document.getElementById('save-preferences');
+        const closeBtn = document.getElementById('close-modal');
+        const allowAnalytical = document.getElementById('allow-analytical');
+        const allowMarketing = document.getElementById('allow-marketing');
+        saveBtn.addEventListener('click', () => {
+            setCookiePreferences({ analytical: allowAnalytical.checked, marketing: allowMarketing.checked });
+            modalOverlay.remove();
+            if (banner) banner.remove();
+        });
+        closeBtn.addEventListener('click', () => { modalOverlay.remove(); });
+    }
+    if (!getCookiePreferences()) { showCookieBanner(); }
+    const openSettingsBtn = document.getElementById('openCookieSettingsBtn');
+    if (openSettingsBtn) { openSettingsBtn.addEventListener('click', () => { showCookieModal(); }); }
+</script>
+</body>
+</html>
