@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maritime Link | Crew & Maritime Transport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #0a2b3e;
+            --accent: #1e6f8c;
+            --accent-light: #2c8eae;
+            --glass-bg: rgba(255, 255, 255, 0.88);
+            --glass-border: rgba(30, 111, 140, 0.3);
+            --shadow-premium: 0 30px 60px -12px rgba(10, 43, 62, 0.12);
+            --bg-light: #f8fafc;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-light); 
+            color: #1e293b;
+            scroll-behavior: smooth; 
+        }
+        
+        h1, h2, h3, .brand-font { font-family: 'Playfair Display', serif; }
+        
+        .section-with-bg {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow: hidden;
+        }
+
+        .bg-overlay-light {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(5px);
+        }
+
+        .bg-overlay-dark {
+            background: rgba(10, 43, 62, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            box-shadow: var(--shadow-premium);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 40px 80px -15px rgba(10, 43, 62, 0.18);
+        }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, #0a2b3e 0%, #1e6f8c 100%);
+            color: white; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 20px -5px rgba(10, 43, 62, 0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 15px 30px -5px rgba(10, 43, 62, 0.3);
+            background: linear-gradient(135deg, #1e6f8c 0%, #0a2b3e 100%);
+        }
+        
+        /* Carrousel stijlen (maritiem thema) */
+        .carousel-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-premium);
+            padding: 32px;
+        }
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .step.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 28px;
+            gap: 16px;
+        }
+        .carousel-nav button {
+            background: linear-gradient(135deg, #0a2b3e 0%, #1e6f8c 100%);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .carousel-nav button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #map {
+            width: 100%;
+            height: 450px;
+            border-radius: 24px;
+            z-index: 1;
+            border: 4px solid white;
+            box-shadow: var(--shadow-premium);
+        }
+        .info-inside-map {
+            background: white;
+            margin-top: 20px;
+            padding: 18px 20px;
+            border-radius: 28px;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .info-card {
+            flex: 1;
+            text-align: center;
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 16px 12px;
+        }
+        .info-card .label { font-size: .85rem; text-transform: uppercase; color: #5b6e8c; }
+        .info-card .value { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin-top: 6px; }
+        
+        .vehicle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+        .vehicle-card {
+            background: #f1f5f9;
+            border-radius: 28px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: .2s;
+            border: 2px solid transparent;
+        }
+        .vehicle-card.selected { border-color: var(--accent); background: #e0f2fe; }
+        .vehicle-emoji { font-size: 2.5rem; }
+        .vehicle-name { font-weight: 700; font-size: 1.1rem; margin-top: 8px; }
+        
+        .extra-fields {
+            background: rgba(241, 245, 249, 0.6);
+            border-radius: 28px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .extra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .checkbox-grid label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 10px 14px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+        .field { margin-bottom: 24px; }
+        label { font-weight: 600; margin-bottom: 8px; display: block; font-size: .85rem; }
+        input, .datetime-local, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 28px;
+            font-size: .95rem;
+            background: white;
+        }
+        .suggest-wrapper { position: relative; }
+        .suggestions {
+            position: absolute;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-top: none;
+            max-height: 220px;
+            overflow-y: auto;
+            width: 100%;
+            z-index: 1000;
+            border-radius: 0 0 24px 24px;
+            display: none;
+        }
+        .suggestion-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: .9rem;
+        }
+        .suggestion-item:hover { background: #f1f5f9; }
+        .roundtrip-box {
+            background: #f8fafc;
+            border-radius: 32px;
+            padding: 14px 20px;
+            margin: 16px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .urgent-whatsapp {
+            background: #dcfce7;
+            border-left: 5px solid #25d366;
+            border-radius: 28px;
+            padding: 14px 20px;
+            margin-top: 16px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .urgent-whatsapp.show { display: flex; }
+        .whatsapp-btn {
+            background: #25d366;
+            color: white;
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 48px;
+            font-weight: 700;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .overlay.active { display: flex; }
+        .overlay-content {
+            max-width: 1200px;
+            width: 90%;
+            background: white;
+            border-radius: 40px;
+            padding: 32px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 24px;
+            margin: 24px 0;
+        }
+        .summary-section {
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 20px;
+        }
+        .summary-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--accent);
+            padding-left: 14px;
+        }
+        .payment-method {
+            background: #f1f5f9;
+            border-radius: 40px;
+            padding: 16px 24px;
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .overlay-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        .close-overlay {
+            float: right;
+            font-size: 32px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        @media (max-width: 900px) {
+            .summary-grid { grid-template-columns: 1fr; }
+            .carousel-container { padding: 20px; }
+            .checkbox-grid { grid-template-columns: repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body id="app-body" class="bg-slate-50">
+
+<!-- Navigation Header (origineel) -->
+<header class="bg-white/80 backdrop-blur-md border-b sticky top-0 z-[1001]">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="text-2xl font-bold brand-font tracking-tight cursor-pointer" onclick="window.scrollTo(0,0)">
+            Maritime<span class="text-[#1e6f8c]">Link</span>
+            <span class="text-[10px] text-gray-400 ml-2 font-normal" data-i18n="tagline">Crew • Port • Logistics</span>
+        </div>
+        <div class="hidden lg:flex items-center space-x-8 text-sm font-semibold uppercase tracking-wider">
+            <a href="#hero" class="nav-link" data-i18n="nav_home">Home</a>
+            <a href="#booking-section" class="nav-link" data-i18n="nav_booking">Boeken</a>
+            <a href="#services" class="nav-link" data-i18n="nav_services">Diensten</a>
+            <a href="#gallery" class="nav-link" data-i18n="nav_port">Haven</a>
+            <a href="#about" class="nav-link" data-i18n="nav_about">Over Ons</a>
+            <a href="#partners" class="nav-link" data-i18n="nav_partners">Partners</a>
+        </div>
+        <div class="flex items-center space-x-3 border-l pl-6">
+            <button onclick="setLanguage('nl')" class="hover:scale-110 transition-transform px-2 py-1 rounded bg-gray-100 text-sm font-semibold">NL</button>
+            <button onclick="setLanguage('fr')" class="hover:scale-110 transition-transform px-2 py-1 rounded bg-gray-100 text-sm font-semibold">FR</button>
+            <button onclick="setLanguage('en')" class="hover:scale-110 transition-transform px-2 py-1 rounded bg-gray-100 text-sm font-semibold">EN</button>
+        </div>
+    </div>
+</header>
+
+<!-- Hero Section (origineel) -->
+<section id="hero" class="relative h-[85vh] flex items-center overflow-hidden section-with-bg" style="background-image: url('havenantwerpen/Gemini_Generated_Image_3zdbru3zdbru3zdb.png');">
+    <div class="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent z-10"></div>
+    <div class="container mx-auto px-4 relative z-20 text-white">
+        <div class="max-w-3xl animate-reveal">
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-16 h-1 bg-[#1e6f8c]"></div>
+                <span class="text-[#1e6f8c] uppercase tracking-[0.4em] text-sm font-black" data-i18n="hero_badge">Crew • Maritime • Logistics</span>
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black mb-8 leading-[0.9] brand-font tracking-tighter" data-i18n="hero_title">Connecting the<br><span>Maritime World</span></h1>
+            <p class="text-xl md:text-2xl mb-6 font-light text-slate-200 leading-relaxed max-w-2xl" data-i18n="hero_desc">Specialized crew changes, port-to-port transport, and maritime logistics across Belgium and worldwide.</p>
+            <p class="text-lg md:text-xl mb-10 text-[#1e6f8c] font-bold tracking-wide italic" data-i18n="hero_price_note">Fair pricing, direct connection – bridging the gap between client and driver.</p>
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8">
+                <a href="#booking-section" class="btn-primary px-12 py-6 rounded-full font-black uppercase tracking-[0.2em] text-center" data-i18n="hero_btn_book">Book Your Ride</a>
+                <a href="#about" class="border-2 border-white/40 hover:border-[#1e6f8c] text-white px-12 py-6 rounded-full font-black uppercase tracking-[0.2em] transition-all text-center backdrop-blur-sm" data-i18n="hero_btn_philosophy">Our Philosophy</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Maritime Gallery Section (origineel) -->
+<section id="gallery" class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <div class="flex items-center justify-center space-x-3 mb-4">
+                <div class="w-12 h-1 bg-[#1e6f8c]"></div>
+                <span class="text-[#1e6f8c] font-bold uppercase tracking-[0.3em] text-xs" data-i18n="gallery_badge">Port of Antwerp</span>
+                <div class="w-12 h-1 bg-[#1e6f8c]"></div>
+            </div>
+            <h2 class="text-4xl md:text-5xl font-bold mb-4 brand-font" data-i18n="gallery_title">Where Industry Meets the Sea</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto" data-i18n="gallery_desc">Our operational heart beats in the Port of Antwerp – a hub of global maritime activity.</p>
+        </div>
+        <div class="gallery-grid">
+            <div class="portrait-card"><img src="havenantwerpen/Gemini_Generated_Image_6631m96631m96631.png" alt="Container terminal"><div class="p-4 bg-gray-50"><h3 class="font-bold" data-i18n="gallery_terminal_title">Container Terminal</h3><p class="text-sm text-gray-500" data-i18n="gallery_terminal_desc">24/7 operaties, Europa's tweede grootste haven</p></div></div>
+            <div class="portrait-card"><img src="havenantwerpen/Gemini_Generated_Image_33zdi533zdi533zd.png" alt="Havenkranen"><div class="p-4 bg-gray-50"><h3 class="font-bold" data-i18n="gallery_cranes_title">Havenkranen</h3><p class="text-sm text-gray-500" data-i18n="gallery_cranes_desc">Industrieel landschap, moderne terminaloperaties</p></div></div>
+            <div class="portrait-card"><img src="havenantwerpen/Gemini_Generated_Image_m2bw7qm2bw7qm2bw.png" alt="Luchtfoto"><div class="p-4 bg-gray-50"><h3 class="font-bold" data-i18n="gallery_aerial_title">Luchtfoto Haven</h3><p class="text-sm text-gray-500" data-i18n="gallery_aerial_desc">Europe's gateway to global trade</p></div></div>
+            <div class="portrait-card"><img src="havenantwerpen/Gemini_Generated_Image_bynigabynigabyni.png" alt="Douane"><div class="p-4 bg-gray-50"><h3 class="font-bold" data-i18n="gallery_customs_title">Douane & Documenten</h3><p class="text-sm text-gray-500" data-i18n="gallery_customs_desc">Crew support, formaliteiten</p></div></div>
+            <div class="portrait-card"><img src="havenantwerpen/Gemini_Generated_Image_rsib3hrsib3hrsib.png" alt="Logistiek"><div class="p-4 bg-gray-50"><h3 class="font-bold" data-i18n="gallery_port_title">Port-to-Port</h3><p class="text-sm text-gray-500" data-i18n="gallery_port_desc">Naadloze verbindingen tussen havens</p></div></div>
+            <div class="portrait-card"><img src="havenantwerpen/Gemini_Generated_Image_o4v8zoo4v8zoo4v8.png" alt="Haven bij nacht"><div class="p-4 bg-gray-50"><h3 class="font-bold" data-i18n="gallery_night_title">Haven bij Nacht</h3><p class="text-sm text-gray-500" data-i18n="gallery_night_desc">24/7 operaties</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- BOEKINGSECTIE (Carrousel) -->
+<section id="booking-section" class="py-24 section-with-bg" style="background-image: url('havenantwerpen/Gemini_Generated_Image_3zdbru3zdbru3zdb.png');">
+    <div class="absolute inset-0 bg-overlay-light z-0"></div>
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="carousel-container">
+            <!-- STAP 1: Ritplanner -->
+            <div id="step1" class="step active">
+                <h1 class="text-2xl font-bold mb-2">🚖 Ritplanner</h1>
+                <div class="sub text-sm text-gray-500 mb-6">België – €1/km | geen verleden / &lt; 1u → WhatsApp</div>
+                <div class="field"><label>📍 Ophaaladres <span class="required-star">*</span></label><div class="suggest-wrapper" id="pickupWrap"><input type="text" id="pickupInput" placeholder="bv. Antwerpen Haven" autocomplete="off"><div id="pickupSuggest" class="suggestions"></div></div></div>
+                <div class="field"><label>🏁 Afzetadres <span class="required-star">*</span></label><div class="suggest-wrapper" id="dropoffWrap"><input type="text" id="dropoffInput" placeholder="bv. Zeebrugge" autocomplete="off"><div id="dropoffSuggest" class="suggestions"></div></div></div>
+                <div class="roundtrip-box"><input type="checkbox" id="roundtripCheckbox"><label for="roundtripCheckbox">🔄 Heen en terug rit</label><span style="font-size:.8rem;">(x2)</span></div>
+                <div class="field"><label>✈️ Vluchtnummer (optioneel)</label><input type="text" id="flightNumber" placeholder="bv. BA398"></div>
+                <div class="field"><label>📅 Datum & tijd</label><input type="datetime-local" id="datetime"></div>
+                <button id="calcRouteBtn" class="w-full btn-primary py-3 rounded-full">📊 Bereken uw rit</button>
+                <div id="errorMsg" class="error mt-4"></div>
+                <div id="urgentWhatsApp" class="urgent-whatsapp"><span>⚠️ Vertrekt binnen het uur – WhatsApp</span><a href="https://wa.me/32470123456?text=Ik%20wil%20een%20dringende%20taxi%20boeken" target="_blank" class="whatsapp-btn">📱 WhatsApp nu</a></div>
+            </div>
+
+            <!-- STAP 2: Kaart & Route -->
+            <div id="step2" class="step">
+                <h2 class="text-xl font-bold mb-4">🗺️ Route overzicht</h2>
+                <div id="map"></div>
+                <div class="info-inside-map">
+                    <div class="info-card"><div class="label">📏 Afstand</div><div class="value" id="distVal">—</div><small>km</small></div>
+                    <div class="info-card"><div class="label">⏱️ Reistijd</div><div class="value" id="timeVal">—</div><small>min</small></div>
+                    <div class="info-card"><div class="label">💰 Prijs</div><div class="value" id="priceVal">—</div><small>€</small></div>
+                </div>
+                <button id="nextToVehicle" class="w-full btn-primary py-3 rounded-full">Volgende → Voertuig kiezen</button>
+            </div>
+
+            <!-- STAP 3: Voertuig & Opties -->
+            <div id="step3" class="step">
+                <h2 class="text-xl font-bold mb-4">🚘 Kies uw voertuig</h2>
+                <div class="vehicle-grid" id="vehicleGrid">
+                    <div class="vehicle-card" data-vehicle="Standaard" data-extraprice="0"><div class="vehicle-emoji">🚗</div><div class="vehicle-name">Standaard</div><div class="vehicle-price text-sm">geen meerprijs</div></div>
+                    <div class="vehicle-card" data-vehicle="Break" data-extraprice="5"><div class="vehicle-emoji">🚙</div><div class="vehicle-name">Break</div><div class="vehicle-price text-sm">+ €5</div></div>
+                    <div class="vehicle-card" data-vehicle="Exclusieve" data-extraprice="15"><div class="vehicle-emoji">🚘</div><div class="vehicle-name">Exclusieve</div><div class="vehicle-price text-sm">+ €15</div></div>
+                    <div class="vehicle-card" data-vehicle="Mini Van" data-extraprice="10"><div class="vehicle-emoji">🚐</div><div class="vehicle-name">Mini Van</div><div class="vehicle-price text-sm">+ €10</div></div>
+                </div>
+                <div class="extra-fields"><h3>➕ Extra opties</h3>
+                    <div class="extra-grid">
+                        <div class="extra-field"><label>👥 Aantal passagiers</label><input type="number" id="passengers" min="1" value="1"></div>
+                        <div class="extra-field"><label>🧳 Bagagestuks</label><input type="number" id="luggage" min="0" value="0"></div>
+                    </div>
+                    <div class="checkbox-grid">
+                        <label><input type="checkbox" id="meetGreet"> 🤝 Meet & Greet</label>
+                        <label><input type="checkbox" id="kissRide"> 💋 Kiss & Ride</label>
+                        <label><input type="checkbox" id="waterBottle"> 💧 Waterfles</label>
+                        <label><input type="checkbox" id="wifi"> 📶 WiFi</label>
+                    </div>
+                    <div class="extra-field"><label>📝 Speciale wensen</label><textarea id="specialWishes" rows="2" placeholder="bv. kinderzitje"></textarea></div>
+                </div>
+                <button id="saveVehicleBtn" class="w-full btn-primary py-3 rounded-full" disabled>Bevestig voertuig en opties</button>
+                <div id="vehicleError" class="error mt-4"></div>
+            </div>
+
+            <!-- STAP 4: Uw gegevens -->
+            <div id="step4" class="step">
+                <h2 class="text-xl font-bold mb-4">📋 Uw gegevens</h2>
+                <div class="field"><label>Naam <span class="required-star">*</span></label><input type="text" id="firstName" placeholder="Voornaam"></div>
+                <div class="field"><label>Achternaam <span class="required-star">*</span></label><input type="text" id="lastName" placeholder="Achternaam"></div>
+                <div class="field"><label>GSM <span class="required-star">*</span></label><input type="tel" id="phone" placeholder="+32 4xx xx xx xx"></div>
+                <div class="field"><label>E-mail <span class="required-star">*</span></label><input type="email" id="email" placeholder="info@voorbeeld.be"></div>
+                <div class="field"><label>BTW (optioneel)</label><input type="text" id="vat" placeholder="BE 0123.456.789"></div>
+                <button id="reserveFinalBtn" class="w-full btn-primary py-3 rounded-full">✅ Reserveer rit</button>
+                <div id="backErrorMsg" class="error mt-4"></div>
+            </div>
+
+            <!-- Carrousel navigatieknoppen -->
+            <div class="carousel-nav">
+                <button id="prevStepBtn" disabled>◀ Vorige</button>
+                <button id="nextStepBtn">Volgende ▶</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services, About, Partners, Footer (origineel) -->
+<section id="services" class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-16"><h2 class="text-4xl font-bold mb-4" data-i18n="services_title">Maritime & Port Services</h2><p class="text-gray-500 max-w-2xl mx-auto" data-i18n="services_desc">Complete transport solutions for crew, cargo, and maritime operations.</p></div>
+        <div class="grid md:grid-cols-3 gap-8 text-center">
+            <div class="p-8 rounded-2xl bg-gray-50"><i class="fas fa-ship text-4xl text-[#1e6f8c] mb-6"></i><h3 class="text-xl font-bold mb-3" data-i18n="service_crew_title">Crew Changes</h3><p class="text-sm text-gray-600" data-i18n="service_crew_desc">Specialized crew transport to/from vessels, with customs assistance.</p></div>
+            <div class="p-8 rounded-2xl bg-gray-50"><i class="fas fa-file-alt text-4xl text-[#1e6f8c] mb-6"></i><h3 class="text-xl font-bold mb-3" data-i18n="service_docs_title">Express Documents</h3><p class="text-sm text-gray-600" data-i18n="service_docs_desc">Urgent transport of maritime documents, samples, and packages.</p></div>
+            <div class="p-8 rounded-2xl bg-gray-50"><i class="fas fa-truck-ramp-box text-4xl text-[#1e6f8c] mb-6"></i><h3 class="text-xl font-bold mb-3" data-i18n="service_port_title">Port-to-Port</h3><p class="text-sm text-gray-600" data-i18n="service_port_desc">Seamless connections between ports and terminals.</p></div>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="py-32 section-with-bg" style="background-image: url('havenantwerpen/Gemini_Generated_Image_3zdbru3zdbru3zdb.png');">
+    <div class="absolute inset-0 bg-overlay-light z-0"></div>
+    <div class="container mx-auto px-4 grid md:grid-cols-2 gap-20 items-center relative z-10">
+        <div><div class="flex items-center space-x-3 mb-6"><div class="w-12 h-1 bg-[#1e6f8c]"></div><span class="text-[#1e6f8c] font-bold uppercase tracking-[0.3em] text-xs" data-i18n="about_badge">Our Maritime Philosophy</span></div><h2 class="text-4xl md:text-6xl font-bold mb-8 brand-font" data-i18n="about_title">Connecting People.<br>Building Trust.</h2><p class="text-xl text-gray-600 mb-8 leading-relaxed" data-i18n="about_desc1">Maritime Link was born from a simple observation: large logistics corporations operate with excessive margins.</p><p class="text-lg text-gray-500 mb-12 border-l-4 border-[#1e6f8c] pl-8 italic" data-i18n="about_desc2">Our mission is to bridge the gap between client and driver. No unnecessary intermediaries.</p></div>
+        <div class="relative"><div class="relative rounded-[32px] overflow-hidden shadow-2xl border-8 border-white"><img src="havenantwerpen/Gemini_Generated_Image_963c0q963c0q963c.png" alt="Container Terminal" class="w-full object-cover"></div></div>
+    </div>
+</section>
+
+<section id="partners" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4 text-center">
+        <h3 class="text-2xl font-bold mb-8" data-i18n="partners_title">Trusted by Maritime Leaders</h3>
+        <div class="flex flex-wrap justify-center items-center gap-12 opacity-70">
+            <span class="text-xl font-semibold text-gray-400">Antwerp Port Authority</span>
+            <span class="text-xl font-semibold text-gray-400">CMA CGM</span>
+            <span class="text-xl font-semibold text-gray-400">MSC</span>
+            <span class="text-xl font-semibold text-gray-400">DP World</span>
+        </div>
+    </div>
+</section>
+
+<!-- AANGEPASTE FOOTER met links naar M-pagina's -->
+<footer class="bg-[#0a2b3e] text-white py-12">
+    <div class="container mx-auto px-4 text-center">
+        <div class="flex flex-wrap justify-center gap-4 mb-6 text-sm">
+            <a href="Mprivacy.html" class="hover:text-[#1e6f8c] transition">Privacy</a> |
+            <a href="Mcookiebeleid.html" class="hover:text-[#1e6f8c] transition">Cookiebeleid</a> |
+            <a href="Malgemene-voorwaarden.html" class="hover:text-[#1e6f8c] transition">Algemene voorwaarden</a> |
+            <a href="Mfaq.html" class="hover:text-[#1e6f8c] transition">FAQ</a>
+        </div>
+        <p data-i18n="copyright">&copy; 2026 Maritime Link. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Overlay (samenvatting) - blijft zoals in de oorspronkelijke logica -->
+<div id="summaryOverlay" class="overlay"><div class="overlay-content"><button class="close-overlay" id="closeOverlayBtn">&times;</button><h2 style="margin-top:0;clear:both">📋 Samenvatting reservatie</h2><div id="overlaySummary" class="summary-grid"></div>
+    <div class="payment-method"><span>💰 Betaalmethode:</span><label><input type="radio" name="payment" value="Cash" checked> 💵 Cash</label><label><input type="radio" name="payment" value="Kaart" id="paymentCard"> 💳 Kaart</label><label><input type="radio" name="payment" value="App" id="paymentApp"> 📱 App</label>
+        <span id="paymentLinkPlaceholder" style="margin-left:auto"></span>
+    </div>
+    <div class="overlay-actions"><button id="cancelOverlayBtn" class="btn-cancel bg-gray-500 text-white px-6 py-2 rounded-full">Annuleer</button><button id="confirmBookingBtn" class="btn-confirm bg-gradient-to-r from-[#0a2b3e] to-[#1e6f8c] text-white px-6 py-2 rounded-full">✅ Bevestig boeking</button></div>
+    <div class="hint text-xs text-gray-500 mt-3">📌 Bij betaling met Kaart of App wordt een betaallink getoond (demo).</div>
+</div></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // ===================== ORIGINELE MARITIME LINK TAAL & OVERIGE FUNCTIES =====================
+    const translations = {
+        nl: {
+            tagline: "Crew • Haven • Logistiek", nav_home: "Home", nav_booking: "Boeken", nav_services: "Diensten", nav_port: "Haven", nav_about: "Over Ons", nav_partners: "Partners",
+            hero_badge: "Crew • Maritiem • Logistiek", hero_title: "Connecting the<br><span>Maritime World</span>", hero_desc: "Gespecialiseerde crew changes, haven- tot-haventransport en maritieme logistiek in België en wereldwijd.", hero_price_note: "Eerlijke prijzen, directe verbinding – de kloof tussen klant en chauffeur overbruggen.", hero_btn_book: "Boek uw rit", hero_btn_philosophy: "Onze Filosofie",
+            gallery_badge: "Haven van Antwerpen", gallery_title: "Waar Industrie de Zee Ontmoet", gallery_desc: "Ons operationele hart klopt in de Haven van Antwerpen – een hub van wereldwijde maritieme activiteit.",
+            gallery_terminal_title: "Container Terminal", gallery_terminal_desc: "24/7 operaties, Europa's tweede grootste haven",
+            gallery_cranes_title: "Havenkranen", gallery_cranes_desc: "Industrieel landschap, moderne terminaloperaties",
+            gallery_aerial_title: "Luchtfoto Haven", gallery_aerial_desc: "Europese gateway naar wereldwijde handel",
+            gallery_customs_title: "Douane & Documenten", gallery_customs_desc: "Crew ondersteuning, formaliteiten",
+            gallery_port_title: "Port-to-Port", gallery_port_desc: "Naadloze verbindingen tussen havens",
+            gallery_night_title: "Haven bij Nacht", gallery_night_desc: "24/7 operaties",
+            services_title: "Maritieme & Haven Diensten", services_desc: "Complete transportoplossingen voor bemanning, vracht en maritieme operaties.",
+            service_crew_title: "Crew Changes", service_crew_desc: "Gespecialiseerd crew transport naar/van schepen, met douane-assistentie.",
+            service_docs_title: "Express Documenten", service_docs_desc: "Urgent transport van maritieme documenten, monsters en pakketten.",
+            service_port_title: "Port-to-Port", service_port_desc: "Naadloze verbindingen tussen havens en terminals.",
+            about_badge: "Onze Maritieme Filosofie", about_title: "Mensen Verbinden.<br>Vertrouwen Opbouwen.", about_desc1: "Maritime Link is ontstaan uit een simpele observatie: grote logistieke bedrijven werken met buitensporige marges.", about_desc2: "Onze missie is de kloof tussen klant en chauffeur te overbruggen. Geen onnodige tussenpersonen.",
+            partners_title: "Vertrouwd door Maritieme Leiders", copyright: "© 2026 Maritime Link. Alle rechten voorbehouden."
+        },
+        fr: {
+            tagline: "Équipage • Port • Logistique", nav_home: "Accueil", nav_booking: "Réserver", nav_services: "Services", nav_port: "Port", nav_about: "À Propos", nav_partners: "Partenaires",
+            hero_badge: "Équipage • Maritime • Logistique", hero_title: "Connecter le<br><span>Monde Maritime</span>", hero_desc: "Changements d'équipage spécialisés, transport port-à-port et logistique maritime en Belgique et dans le monde.", hero_price_note: "Prix équitables, connexion directe – combler le fossé entre client et chauffeur.", hero_btn_book: "Réserver Votre Trajet", hero_btn_philosophy: "Notre Philosophie",
+            gallery_badge: "Port d'Anvers", gallery_title: "Là où l'Industrie Rencontre la Mer", gallery_desc: "Notre cœur opérationnel bat dans le Port d'Anvers – un hub de l'activité maritime mondiale.",
+            gallery_terminal_title: "Terminal à Conteneurs", gallery_terminal_desc: "Opérations 24/7, deuxième plus grand port d'Europe",
+            gallery_cranes_title: "Grues Portuaires", gallery_cranes_desc: "Paysage industriel, opérations terminal modernes",
+            gallery_aerial_title: "Vue Aérienne du Port", gallery_aerial_desc: "Porte d'entrée européenne vers le commerce mondial",
+            gallery_customs_title: "Douane & Documents", gallery_customs_desc: "Assistance équipage, formalités",
+            gallery_port_title: "Port-à-Port", gallery_port_desc: "Connexions fluides entre ports",
+            gallery_night_title: "Port de Nuit", gallery_night_desc: "Opérations 24/7",
+            services_title: "Services Maritimes & Portuaires", services_desc: "Solutions de transport complètes pour équipage, fret et opérations maritimes.",
+            service_crew_title: "Changements d'Équipage", service_crew_desc: "Transport spécialisé d'équipage vers/depuis les navires, avec assistance douanière.",
+            service_docs_title: "Documents Express", service_docs_desc: "Transport urgent de documents maritimes, échantillons et colis.",
+            service_port_title: "Port-à-Port", service_port_desc: "Connexions fluides entre ports et terminaux.",
+            about_badge: "Notre Philosophie Maritime", about_title: "Connecter les Gens.<br>Bâtir la Confiance.", about_desc1: "Maritime Link est né d'une simple observation: les grandes entreprises de logistique opèrent avec des marges excessives.", about_desc2: "Notre mission est de combler le fossé entre client et chauffeur. Pas d'intermédiaires inutiles.",
+            partners_title: "Approuvé par les Leaders Maritimes", copyright: "© 2026 Maritime Link. Tous droits réservés."
+        },
+        en: {
+            tagline: "Crew • Port • Logistics", nav_home: "Home", nav_booking: "Book", nav_services: "Services", nav_port: "Port", nav_about: "About", nav_partners: "Partners",
+            hero_badge: "Crew • Maritime • Logistics", hero_title: "Connecting the<br><span>Maritime World</span>", hero_desc: "Specialized crew changes, port-to-port transport, and maritime logistics across Belgium and worldwide.", hero_price_note: "Fair pricing, direct connection – bridging the gap between client and driver.", hero_btn_book: "Book Your Ride", hero_btn_philosophy: "Our Philosophy",
+            gallery_badge: "Port of Antwerp", gallery_title: "Where Industry Meets the Sea", gallery_desc: "Our operational heart beats in the Port of Antwerp – a hub of global maritime activity.",
+            gallery_terminal_title: "Container Terminal", gallery_terminal_desc: "24/7 operations, Europe's second largest port",
+            gallery_cranes_title: "Port Cranes", gallery_cranes_desc: "Industrial landscape, modern terminal operations",
+            gallery_aerial_title: "Aerial Port View", gallery_aerial_desc: "Europe's gateway to global trade",
+            gallery_customs_title: "Customs & Documents", gallery_customs_desc: "Crew support, formalities",
+            gallery_port_title: "Port-to-Port", gallery_port_desc: "Seamless connections between ports",
+            gallery_night_title: "Port at Night", gallery_night_desc: "24/7 operations",
+            services_title: "Maritime & Port Services", services_desc: "Complete transport solutions for crew, cargo, and maritime operations.",
+            service_crew_title: "Crew Changes", service_crew_desc: "Specialized crew transport to/from vessels, with customs assistance.",
+            service_docs_title: "Express Documents", service_docs_desc: "Urgent transport of maritime documents, samples, and packages.",
+            service_port_title: "Port-to-Port", service_port_desc: "Seamless connections between ports and terminals.",
+            about_badge: "Our Maritime Philosophy", about_title: "Connecting People.<br>Building Trust.", about_desc1: "Maritime Link was born from a simple observation: large logistics corporations operate with excessive margins.", about_desc2: "Our mission is to bridge the gap between client and driver. No unnecessary intermediaries.",
+            partners_title: "Trusted by Maritime Leaders", copyright: "© 2026 Maritime Link. All rights reserved."
+        }
+    };
+    
+    function setLanguage(lang) {
+        document.documentElement.lang = lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (translations[lang] && translations[lang][key]) el.innerHTML = translations[lang][key];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (translations[lang] && translations[lang][key]) el.placeholder = translations[lang][key];
+        });
+    }
+    setLanguage('nl');
+    
+    // ===================== BOEKINGSLOGICA (volledig, €1/km, Supabase) aangepast voor carrousel =====================
+    (function(){
+        const SUPABASE_URL = 'https://kwsuqzbqzsmgkjaslwkz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3c3VxemJxenNtZ2tqYXNsd2t6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMTUwMDQsImV4cCI6MjA5MjY5MTAwNH0.DBgx2oq0LbXwUlPQv3cmYMvGEjYA6bhy-2hejvgtERE';
+
+        let map, pickupCoord = null, dropoffCoord = null, routeLayer = null, pickupMarker = null, dropoffMarker = null;
+        let currentRouteData = null, currentRoundTrip = false, currentFlight = "", currentDateTime = "";
+        let selectedVehicle = null, selectedVehicleExtra = 0;
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        // Carrousel navigatie
+        function showStep(step) {
+            for (let i = 1; i <= totalSteps; i++) {
+                const el = document.getElementById(`step${i}`);
+                if (el) el.classList.toggle('active', i === step);
+            }
+            const prevBtn = document.getElementById('prevStepBtn');
+            const nextBtn = document.getElementById('nextStepBtn');
+            if (prevBtn) prevBtn.disabled = (step === 1);
+            if (nextBtn) nextBtn.disabled = false;
+            if (step === totalSteps && nextBtn) nextBtn.disabled = true;
+            
+            // Kaart correct weergeven wanneer stap 2 actief wordt
+            if (step === 2 && map) {
+                setTimeout(() => {
+                    map.invalidateSize();
+                    if (currentRouteData && pickupCoord && dropoffCoord) {
+                        map.fitBounds([[pickupCoord.lat, pickupCoord.lon], [dropoffCoord.lat, dropoffCoord.lon]], { padding: [50, 50] });
+                    }
+                }, 100);
+            }
+        }
+        
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                // Validatie bij overgang van stap 1 naar stap 2: route berekenen (zoals onCalcAndFlip)
+                if (currentStep === 1) {
+                    const pi = document.getElementById('pickupInput');
+                    const di = document.getElementById('dropoffInput');
+                    if (!pi.value.trim()) { showErrorMsg('Ophaaladres verplicht.'); return; }
+                    if (!di.value.trim()) { showErrorMsg('Afzetadres verplicht.'); return; }
+                    if (!pickupCoord || !dropoffCoord) { showErrorMsg('Selecteer adressen uit suggesties.'); return; }
+                    const dt = document.getElementById('datetime').value;
+                    if (!dt) { showErrorMsg('Kies datum/tijd.'); return; }
+                    if (isPast(dt)) { showErrorMsg('❌ Geen ritten in verleden.'); return; }
+                    const urgent = isWithinNextHour(dt);
+                    const urgentDiv = document.getElementById('urgentWhatsApp');
+                    if (urgentDiv) urgent ? urgentDiv.classList.add('show') : urgentDiv.classList.remove('show');
+                    
+                    const btn = document.getElementById('calcRouteBtn');
+                    btn.disabled = true;
+                    btn.textContent = '📡 Route berekenen...';
+                    calcRoute(pickupCoord.lat, pickupCoord.lon, dropoffCoord.lat, dropoffCoord.lon).then(rd => {
+                        if (!rd) { showErrorMsg('Route mislukt.'); btn.disabled = false; btn.textContent = '📊 Bereken uw rit'; return; }
+                        currentRouteData = rd;
+                        currentRoundTrip = document.getElementById('roundtripCheckbox').checked;
+                        currentFlight = document.getElementById('flightNumber').value;
+                        currentDateTime = dt;
+                        updateMapAndInfo(rd);
+                        btn.disabled = false;
+                        btn.textContent = '📊 Bereken uw rit';
+                        document.getElementById('errorMsg').style.display = 'none';
+                        // Ga naar stap 2
+                        currentStep = 2;
+                        showStep(currentStep);
+                    });
+                    return;
+                }
+                // Stap 2 -> stap 3: geen extra validatie
+                if (currentStep === 2) {
+                    if (!currentRouteData) { showErrorMsg('Bereken eerst een route.'); return; }
+                    currentStep = 3;
+                    showStep(currentStep);
+                    return;
+                }
+                // Stap 3 -> stap 4: controleer of voertuig is geselecteerd
+                if (currentStep === 3) {
+                    if (!selectedVehicle) {
+                        const err = document.getElementById('vehicleError');
+                        err.innerText = 'Selecteer een voertuig.';
+                        err.style.display = 'block';
+                        setTimeout(() => err.style.display = 'none', 3000);
+                        return;
+                    }
+                    currentStep = 4;
+                    showStep(currentStep);
+                    return;
+                }
+                // Stap 4 -> geen volgende, want laatste stap
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+        
+        // Alle ondersteunende functies (genereren ID, extra's, Supabase, adres suggesties, routeberekening, prijs, enz.)
+        // Deze zijn exact hetzelfde als in de flipcard-versie (alleen de namen van de knoppen zijn anders)
+        function generateBookingId() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth()+1).padStart(2,'0');
+            const dd = String(now.getDate()).padStart(2,'0');
+            const today = `${yyyy}${mm}${dd}`;
+            let counter = parseInt(localStorage.getItem('bookingCounter') || '0');
+            counter++;
+            localStorage.setItem('bookingCounter',counter);
+            const formatted = String(counter).padStart(3,'0');
+            return `FX-${today}-${formatted}`;
+        }
+        function getExtrasString() {
+            const extras = [];
+            if(document.getElementById('meetGreet').checked) extras.push("Meet & Greet");
+            if(document.getElementById('kissRide').checked) extras.push("Kiss & Ride");
+            if(document.getElementById('waterBottle').checked) extras.push("Waterfles");
+            if(document.getElementById('wifi').checked) extras.push("WiFi");
+            return extras.join(", ") || "Geen";
+        }
+        function buildSupabaseRecord(paymentMethod, finalAmount) {
+            const nameRaw = document.getElementById('firstName').value.trim();
+            const lastNameRaw = document.getElementById('lastName').value.trim();
+            const fullName = `${nameRaw} ${lastNameRaw}`;
+            const emailRaw = document.getElementById('email').value.trim();
+            const phoneRaw = document.getElementById('phone').value.trim();
+            const pickupRaw = document.getElementById('pickupInput').value;
+            const destRaw = document.getElementById('dropoffInput').value;
+            const flightNumberRaw = document.getElementById('flightNumber').value.trim();
+            const vehicleRaw = selectedVehicle;
+            const extrasRaw = getExtrasString();
+            const dtRaw = document.getElementById('datetime').value;
+            let datePart = "", timePart = "";
+            if(dtRaw){
+                const parts = dtRaw.split('T');
+                datePart = parts[0].split('-').reverse().join('-');
+                timePart = parts[1]?.substring(0,5) || "";
+            }
+            return {
+                id: generateBookingId(),
+                template: "T1",
+                datetime: datePart,
+                time: timePart,
+                name: fullName,
+                email: emailRaw,
+                phone: phoneRaw,
+                pickup: pickupRaw,
+                destination: destRaw,
+                flight_number: flightNumberRaw,
+                vehicle: vehicleRaw,
+                extras: extrasRaw,
+                amount: parseFloat(finalAmount),
+                payment: paymentMethod,
+                status: "pending"
+            };
+        }
+        async function sendToSupabase(record, paymentMethod) {
+            console.log('📦 Verzenden naar Supabase:', record);
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(record)
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                console.log('✅ Boeking opgeslagen (HTTP', response.status, ')');
+                alert(`🎉 Bedankt voor uw reservatie, ${record.name}! 🎉\n\n📋 Uw reserveringsnummer: ${record.id}\n✈️ Vluchtnummer: ${record.flight_number || "geen"}\n✉️ Een bevestiging werd verstuurd naar ${record.email}\n\n✅ We zien u graag binnen!`);
+                return true;
+            } catch (error) {
+                console.error('❌ Supabase fout:', error);
+                alert(`❌ Er ging iets mis met uw reservatie: ${error.message}\n\nProbeer opnieuw of contacteer ons.`);
+                return false;
+            }
+        }
+        async function fetchAddresses(q,wid){
+            if(q.length<3){ clearSuggestions(wid); return; }
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&addressdetails=0&countrycodes=be&accept-language=nl`;
+            try{
+                const r = await fetch(url,{headers:{'User-Agent':'TaxiPlanner/22.0'}});
+                if(!r.ok) throw new Error();
+                const d = await r.json();
+                if(!d.length){ showNoResults(wid); return; }
+                showSuggestions(d.map(p=>({text:p.display_name,lat:parseFloat(p.lat),lon:parseFloat(p.lon)})),wid);
+            } catch { showErrorSuggestion(wid,'Netwerkfout'); }
+        }
+        function showSuggestions(s,wid){
+            const w = document.getElementById(wid);
+            const sd = w.querySelector('.suggestions');
+            sd.innerHTML = '';
+            s.forEach(sug=>{
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = sug.text.length>80?sug.text.slice(0,80)+'…':sug.text;
+                div.onclick = ()=>{ w.querySelector('input').value = sug.text; setCoord(sug.lat,sug.lon,wid); sd.style.display='none'; };
+                sd.appendChild(div);
+            });
+            sd.style.display='block';
+        }
+        function setCoord(lat,lon,wid){ if(wid==='pickupWrap') pickupCoord={lat,lon}; else dropoffCoord={lat,lon}; }
+        function clearSuggestions(wid){ const el = document.getElementById(wid)?.querySelector('.suggestions'); if(el) el.style.display='none'; }
+        function showNoResults(wid){ showTempMsg(wid,'Geen adres in België'); }
+        function showErrorSuggestion(wid,msg){ showTempMsg(wid,msg); }
+        function showTempMsg(wid,msg){
+            const w = document.getElementById(wid);
+            const sd = w.querySelector('.suggestions');
+            sd.innerHTML = `<div class="suggestion-item" style="color:#b91c1c;">❌ ${msg}</div>`;
+            sd.style.display='block';
+            setTimeout(()=>{ if(sd.style.display==='block') sd.style.display='none'; },2500);
+        }
+        async function calcRoute(lat1,lon1,lat2,lon2){
+            const oUrl = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`;
+            try{
+                const r = await fetch(oUrl);
+                if(r.status===429) throw new Error();
+                const d = await r.json();
+                if(d.code==='Ok' && d.routes.length){
+                    const rt = d.routes[0];
+                    return { distanceKm: (rt.distance/1000).toFixed(1), durationMin: Math.round(rt.duration/60), geometry: rt.geometry };
+                }
+            } catch(e) {}
+            return null;
+        }
+        function isPast(ds){ if(!ds) return false; return new Date(ds) < new Date(); }
+        function isWithinNextHour(ds){ if(!ds) return false; const diff = new Date(ds)-new Date(); return diff>0 && diff<3600000; }
+        function showErrorMsg(msg,isBack=false){
+            const el = isBack ? document.getElementById('backErrorMsg') : document.getElementById('errorMsg');
+            el.innerText = msg;
+            el.style.display = 'block';
+            setTimeout(()=>el.style.display='none',5000);
+        }
+        async function updateMapAndInfo(rd){
+            if(!rd || !map) return;
+            if(pickupMarker) map.removeLayer(pickupMarker);
+            if(dropoffMarker) map.removeLayer(dropoffMarker);
+            pickupMarker = L.marker([pickupCoord.lat,pickupCoord.lon]).addTo(map).bindPopup('📍 Ophalen');
+            dropoffMarker = L.marker([dropoffCoord.lat,dropoffCoord.lon]).addTo(map).bindPopup('🏁 Afzetten');
+            map.fitBounds([[pickupCoord.lat,pickupCoord.lon],[dropoffCoord.lat,dropoffCoord.lon]],{padding:[50,50]});
+            if(routeLayer) map.removeLayer(routeLayer);
+            routeLayer = L.geoJSON(rd.geometry,{color:'#1e6f8c',weight:5}).addTo(map);
+            let d = parseFloat(rd.distanceKm), t = rd.durationMin;
+            if(currentRoundTrip){ d*=2; t*=2; }
+            const p = d * 1.0;
+            document.getElementById('distVal').innerText = d.toFixed(1);
+            document.getElementById('timeVal').innerText = t;
+            document.getElementById('priceVal').innerText = p.toFixed(2);
+        }
+        function initVehicleSelection(){
+            document.querySelectorAll('.vehicle-card').forEach(card=>{
+                card.addEventListener('click',()=>{
+                    document.querySelectorAll('.vehicle-card').forEach(c=>c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    selectedVehicle = card.getAttribute('data-vehicle');
+                    selectedVehicleExtra = parseInt(card.getAttribute('data-extraprice'))||0;
+                    document.getElementById('saveVehicleBtn').disabled = false;
+                });
+            });
+        }
+        function buildSummaryHTML(){
+            const fn = document.getElementById('firstName').value.trim();
+            const ln = document.getElementById('lastName').value.trim();
+            const ph = document.getElementById('phone').value.trim();
+            const em = document.getElementById('email').value.trim();
+            const vat = document.getElementById('vat').value.trim();
+            const pu = document.getElementById('pickupInput').value;
+            const doff = document.getElementById('dropoffInput').value;
+            const pax = document.getElementById('passengers').value;
+            const lag = document.getElementById('luggage').value;
+            const mg = document.getElementById('meetGreet').checked?'Ja':'Nee';
+            const kr = document.getElementById('kissRide').checked?'Ja':'Nee';
+            const wb = document.getElementById('waterBottle').checked?'Ja':'Nee';
+            const wf = document.getElementById('wifi').checked?'Ja':'Nee';
+            const sw = document.getElementById('specialWishes').value.trim()||"Geen";
+            let d = parseFloat(currentRouteData.distanceKm), t = currentRouteData.durationMin;
+            if(currentRoundTrip){ d*=2; t*=2; }
+            const base = d * 1.0;
+            const total = base + selectedVehicleExtra;
+            const urg = isWithinNextHour(currentDateTime)?" (spoed)":"";
+            const rt = currentRoundTrip?"Heen en terug":"Enkele rit";
+            return `<div class="summary-section"><h3>🚖 Rit</h3><div class="summary-line"><strong>📍</strong> ${pu}</div><div class="summary-line"><strong>🏁</strong> ${doff}</div><div class="summary-line"><strong>🔄</strong> ${rt}</div><div class="summary-line"><strong>📅</strong> ${currentDateTime}${urg}</div><div class="summary-line"><strong>✈️</strong> ${currentFlight||"geen"}</div></div><div class="summary-section"><h3>👤 Klant</h3><div class="summary-line"><strong>Naam:</strong> ${fn} ${ln}</div><div class="summary-line"><strong>GSM:</strong> ${ph}</div><div class="summary-line"><strong>E-mail:</strong> ${em}</div><div class="summary-line"><strong>BTW:</strong> ${vat||"geen"}</div></div><div class="summary-section"><h3>🚘 Voertuig</h3><div class="summary-line"><strong>Type:</strong> ${selectedVehicle} (+€${selectedVehicleExtra})</div><div class="summary-line"><strong>👥</strong> ${pax} | <strong>🧳</strong> ${lag}</div><div class="summary-line"><strong>🤝</strong> ${mg} | <strong>💋</strong> ${kr} | <strong>💧</strong> ${wb} | <strong>📶</strong> ${wf}</div><div class="summary-line"><strong>📝</strong> ${sw}</div></div><div class="summary-section"><h3>💰 Prijs</h3><div class="summary-line"><strong>Afstand:</strong> ${d.toFixed(1)} km</div><div class="summary-line"><strong>Reistijd:</strong> ${t} min</div><div class="summary-line"><strong>Basis (€1/km):</strong> € ${base.toFixed(2)}</div><div class="summary-line"><strong>Meerprijs:</strong> € ${selectedVehicleExtra.toFixed(2)}</div><div class="summary-line"><strong>Totaal:</strong> € ${total.toFixed(2)}</div></div>`;
+        }
+        function showOverlay(){
+            document.getElementById('overlaySummary').innerHTML = buildSummaryHTML();
+            document.getElementById('summaryOverlay').classList.add('active');
+            preparePaymentLink();
+        }
+        function hideOverlay(){ document.getElementById('summaryOverlay').classList.remove('active'); }
+        function preparePaymentLink(){
+            const payment = document.querySelector('input[name="payment"]:checked').value;
+            const container = document.getElementById('paymentLinkPlaceholder');
+            if(payment==='Kaart'||payment==='App'){
+                container.innerHTML = `<button id="demoPaymentBtn" class="payment-link-btn bg-gray-800 text-white px-4 py-2 rounded-full">🔗 Betaallink (${payment})</button>`;
+                const btn = document.getElementById('demoPaymentBtn');
+                if(btn) btn.onclick = ()=> alert(`💳 Demo betaallink voor ${payment}.`);
+            } else container.innerHTML = '';
+        }
+        async function finalizeBooking(){
+            const pm = document.querySelector('input[name="payment"]:checked').value;
+            let totalAmount = 0;
+            const totalLine = document.querySelector('#overlaySummary .summary-section:last-child .summary-line:last-child')?.innerText;
+            if(totalLine){
+                const match = totalLine.match(/€\s*([\d.]+)/);
+                if(match) totalAmount = parseFloat(match[1]);
+            }
+            const supabaseRecord = buildSupabaseRecord(pm, totalAmount);
+            if(pm==='Kaart'||pm==='App'){
+                if(confirm(`U heeft gekozen voor betaling met ${pm}. Wilt u doorgaan naar de betaalomgeving?`)){
+                    const success = await sendToSupabase(supabaseRecord, pm);
+                    if(success){
+                        alert(`🔜 U wordt doorgestuurd naar de betaallink voor ${pm}.\n(Demo - later echte integratie)`);
+                        resetAll();
+                        hideOverlay();
+                        currentStep = 1;
+                        showStep(1);
+                    }
+                }
+                return;
+            }
+            const success = await sendToSupabase(supabaseRecord, pm);
+            if(success){ resetAll(); hideOverlay(); currentStep = 1; showStep(1); }
+        }
+        function resetAll(){
+            if(routeLayer) map.removeLayer(routeLayer);
+            if(pickupMarker) map.removeLayer(pickupMarker);
+            if(dropoffMarker) map.removeLayer(dropoffMarker);
+            currentRouteData = null;
+            pickupCoord = null;
+            dropoffCoord = null;
+            document.getElementById('distVal').innerText = '—';
+            document.getElementById('timeVal').innerText = '—';
+            document.getElementById('priceVal').innerText = '—';
+            document.getElementById('pickupInput').value = '';
+            document.getElementById('dropoffInput').value = '';
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('vat').value = '';
+            document.getElementById('flightNumber').value = '';
+            document.getElementById('roundtripCheckbox').checked = false;
+            document.getElementById('passengers').value = '1';
+            document.getElementById('luggage').value = '0';
+            document.getElementById('meetGreet').checked = false;
+            document.getElementById('kissRide').checked = false;
+            document.getElementById('waterBottle').checked = false;
+            document.getElementById('wifi').checked = false;
+            document.getElementById('specialWishes').value = '';
+            currentRoundTrip = false;
+            selectedVehicle = null;
+            document.getElementById('saveVehicleBtn').disabled = true;
+            document.querySelectorAll('.vehicle-card').forEach(c=>c.classList.remove('selected'));
+        }
+        function onConfirmVehicle(){
+            if(!selectedVehicle){
+                const err = document.getElementById('vehicleError');
+                err.innerText = 'Selecteer een voertuig.';
+                err.style.display = 'block';
+                setTimeout(()=>err.style.display='none',3000);
+                return;
+            }
+            showOverlay();
+        }
+        function initAutocomplete(){
+            const pInp = document.getElementById('pickupInput'), dInp = document.getElementById('dropoffInput');
+            let pTO,dTO;
+            pInp.addEventListener('input',()=>{ clearTimeout(pTO); pTO = setTimeout(()=>fetchAddresses(pInp.value,'pickupWrap'),300); });
+            dInp.addEventListener('input',()=>{ clearTimeout(dTO); dTO = setTimeout(()=>fetchAddresses(dInp.value,'dropoffWrap'),300); });
+            document.addEventListener('click',(e)=>{ if(!e.target.closest('.suggest-wrapper')){ clearSuggestions('pickupWrap'); clearSuggestions('dropoffWrap'); } });
+        }
+        function initMap(){
+            map = L.map('map').setView([51.2194, 4.4025], 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+        }
+        
+        // roundtrip listener
+        document.getElementById('roundtripCheckbox').addEventListener('change',()=>{
+            if(currentRouteData){
+                currentRoundTrip = document.getElementById('roundtripCheckbox').checked;
+                let d = parseFloat(currentRouteData.distanceKm), t = currentRouteData.durationMin;
+                if(currentRoundTrip){ d*=2; t*=2; }
+                const p = d * 1.0;
+                document.getElementById('distVal').innerText = d.toFixed(1);
+                document.getElementById('timeVal').innerText = t;
+                document.getElementById('priceVal').innerText = p.toFixed(2);
+            }
+        });
+        
+        // Event listeners voor carrouselknoppen
+        document.getElementById('nextStepBtn').addEventListener('click', nextStep);
+        document.getElementById('prevStepBtn').addEventListener('click', prevStep);
+        document.getElementById('nextToVehicle').addEventListener('click', () => {
+            if(currentStep === 2) { nextStep(); }
+        });
+        document.getElementById('saveVehicleBtn').addEventListener('click', onConfirmVehicle);
+        document.getElementById('reserveFinalBtn').addEventListener('click', () => {
+            // Klantgegevens valideren (zoals in onReserve)
+            const fn = document.getElementById('firstName').value.trim();
+            const ln = document.getElementById('lastName').value.trim();
+            const ph = document.getElementById('phone').value.trim();
+            const em = document.getElementById('email').value.trim();
+            if(!fn || !ln || !ph || !em){ showErrorMsg('Vul alle verplichte velden in.', true); return; }
+            if(!currentRouteData){ showErrorMsg('Geen ritgegevens.', true); return; }
+            if(!selectedVehicle){ showErrorMsg('Kies eerst een voertuig.', true); return; }
+            showOverlay();
+        });
+        
+        document.getElementById('closeOverlayBtn').addEventListener('click', hideOverlay);
+        document.getElementById('cancelOverlayBtn').addEventListener('click', hideOverlay);
+        document.getElementById('confirmBookingBtn').addEventListener('click', finalizeBooking);
+        document.querySelectorAll('input[name="payment"]').forEach(radio => radio.addEventListener('change', preparePaymentLink));
+        
+        // Initialisatie
+        initMap();
+        initAutocomplete();
+        initVehicleSelection();
+        const defaultDT = new Date();
+        defaultDT.setHours(defaultDT.getHours() + 1);
+        document.getElementById('datetime').value = defaultDT.toISOString().slice(0,16);
+        showStep(1);
+    })();
+</script>
+</body>
+</html>
