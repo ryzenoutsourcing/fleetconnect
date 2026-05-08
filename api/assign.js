@@ -21,10 +21,10 @@ export default async function handler(req, res) {
   }
 
   // 2. Input Validation & Logging
-  const bookingId = parseInt(req.body.bookingId, 10);
-  const driverId = parseInt(req.body.driverId, 10);
+ const bookingId = String(req.body.bookingId).trim();
+const driverId = parseInt(req.body.driverId, 10);
 
-  if (isNaN(bookingId) || isNaN(driverId)) {
+if (!bookingId || isNaN(driverId)) {
     return res.status(400).json({ success: false, error: "Invalid bookingId or driverId" });
   }
 
